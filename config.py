@@ -1,6 +1,6 @@
 """
 Socrates Blade v3.2 - Security Testing Configuration
-Blogware/Scriptlog CMS Specific Configuration
+Scriptlog CMS Specific Configuration
 
 This configuration file contains:
 - Payload definitions for all attack vectors
