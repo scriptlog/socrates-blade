@@ -2,6 +2,7 @@
 
 **Advanced Security Testing Framework for Scriptlog PHP Blogware**
 
+![Socrates Blade Mascot](assets/socrates-blade-min.png)
 ![Version](https://img.shields.io/badge/version-3.2.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![OWASP Top 10](https://img.shields.io/badge/OWASP-Top%2010%202021-red)
