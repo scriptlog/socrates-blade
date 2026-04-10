@@ -10,7 +10,7 @@
 
 ## What is Socrates Blade?
 
-Socrates Blade is a security testing tool that helps you find vulnerabilities in PHP Blogware applications. It scans your web application for common security issues and provides detailed reports about what it finds.
+Socrates Blade is a security testing tool that helps you find vulnerabilities in Scriptlog PHP Blogware applications. It scans your web application for common security issues and provides detailed reports about what it finds.
 
 Think of it like a health check for your website's security - it looks for weaknesses that hackers might exploit.
 
