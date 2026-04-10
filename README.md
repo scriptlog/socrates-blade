@@ -1,6 +1,6 @@
 # Socrates Blade
 
-**Security Testing Framework for PHP Blogware Applications**
+**Security Testing Framework for Scriptlog PHP Blogware Applications**
 
 ![Socrates Blade Mascot](assets/socrates-blade-min.png)
 ![Version](https://img.shields.io/badge/version-3.2.0-blue)
