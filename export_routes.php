@@ -20,8 +20,6 @@ ini_set('display_errors', '0');
 
 define('SCRIPTLOG', true);
 
-$scriptlogPath = __DIR__ . '/lib/';
-
 if (!function_exists('app_url')) {
     function app_url() {
         static $appUrl = null;
@@ -32,7 +30,7 @@ if (!function_exists('app_url')) {
         
         $appUrl = '';
         
-        $configPath = dirname($scriptlogPath) . '/config.php';
+        $configPath = dirname(__DIR__) . '/config.php';
         if (file_exists($configPath)) {
             $config = @include $configPath;
             if (isset($config['app']['url'])) {
