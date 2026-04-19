@@ -52,3 +52,6 @@ Thumbs.db
 
 # AI Assistant instructions (personal)
 AGENTS.md
+
+# lib -- from scriptlog
+lib/

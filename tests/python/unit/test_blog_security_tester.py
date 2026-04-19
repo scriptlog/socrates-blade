@@ -24,7 +24,7 @@ spec.loader.exec_module(socrates_blade_module)
 BlogSecurityTester = socrates_blade_module.BlogSecurityTester
 Colors = socrates_blade_module.Colors
 
-from config import Config, Severity
+from config import Config, Severity, OWASP, CWE_MAPPINGS
 
 
 class MockArgs:
@@ -361,6 +361,144 @@ class TestPrintStatus(unittest.TestCase):
     def test_print_status_with_severity(self):
         """Test print_status with severity"""
         self.tester.print_status("Test message", "info", Severity.CRITICAL)
+
+
+class TestConfigHelperMethods(unittest.TestCase):
+    """Test Config helper classmethods"""
+
+    def test_get_sql_time_payload_default(self):
+        """Test get_sql_time_payload with default sleep time"""
+        payloads = Config.get_sql_time_payload()
+        self.assertIsInstance(payloads, list)
+        self.assertTrue(len(payloads) > 0)
+
+    def test_get_sql_time_payload_custom(self):
+        """Test get_sql_time_payload with custom sleep time"""
+        payloads = Config.get_sql_time_payload(sleep_time=10)
+        self.assertIsInstance(payloads, list)
+        self.assertTrue(len(payloads) > 0)
+        self.assertIn("10", payloads[0])
+
+    def test_get_all_xss_payloads(self):
+        """Test get_all_xss_payloads returns list"""
+        payloads = Config.get_all_xss_payloads()
+        self.assertIsInstance(payloads, list)
+        self.assertTrue(len(payloads) > 0)
+        self.assertIn("<script>alert('XSS')</script>", payloads)
+
+    def test_get_all_sqli_payloads(self):
+        """Test get_all_sqli_payloads returns list"""
+        payloads = Config.get_all_sqli_payloads()
+        self.assertIsInstance(payloads, list)
+        self.assertTrue(len(payloads) > 0)
+        self.assertIn("' OR 1=1 --", payloads)
+
+    def test_get_all_traversal_payloads(self):
+        """Test get_all_traversal_payloads returns list"""
+        payloads = Config.get_all_traversal_payloads()
+        self.assertIsInstance(payloads, list)
+        self.assertTrue(len(payloads) > 0)
+        self.assertIn("../../../../etc/passwd", payloads)
+
+    def test_get_all_ssrf_payloads(self):
+        """Test get_all_ssrf_payloads returns dict"""
+        payloads = Config.get_all_ssrf_payloads()
+        self.assertIsInstance(payloads, dict)
+        self.assertTrue(len(payloads) > 0)
+        self.assertIn("http://169.254.169.254/latest/meta-data/", payloads)
+
+    def test_get_brute_force_passwords_default(self):
+        """Test get_brute_force_passwords returns list"""
+        passwords = Config.get_brute_force_passwords()
+        self.assertIsInstance(passwords, list)
+        self.assertTrue(len(passwords) > 0)
+        self.assertIn("password", passwords)
+
+    def test_get_brute_force_usernames_default(self):
+        """Test get_brute_force_usernames returns list"""
+        usernames = Config.get_brute_force_usernames()
+        self.assertIsInstance(usernames, list)
+        self.assertTrue(len(usernames) > 0)
+        self.assertIn("admin", usernames)
+
+
+class TestDiscoverForms(unittest.TestCase):
+    """Test discover_forms method"""
+
+    @patch('socrates_blade.requests.Session')
+    def setUp(self, mock_session):
+        self.tester = BlogSecurityTester(MockArgs(target='http://localhost'))
+
+    def test_discover_forms_with_form(self):
+        """Test discovering forms on a page"""
+        html = '''
+        <html>
+        <form action="/submit" method="post">
+            <input type="text" name="username" />
+            <input type="password" name="password" />
+            <input type="submit" value="Login" />
+        </form>
+        </html>
+        '''
+        mock_response = Mock()
+        mock_response.text = html
+        self.tester.session.get = Mock(return_value=mock_response)
+
+        forms = self.tester.discover_forms("http://test.com")
+        self.assertEqual(len(forms), 1)
+        self.assertEqual(forms[0]['method'], 'post')
+        self.assertEqual(len(forms[0]['inputs']), 2)
+
+    def test_discover_forms_no_form(self):
+        """Test discovering forms when none exist"""
+        mock_response = Mock()
+        mock_response.text = '<html><body>No forms here</body></html>'
+        self.tester.session.get = Mock(return_value=mock_response)
+
+        forms = self.tester.discover_forms("http://test.com")
+        self.assertEqual(len(forms), 0)
+
+    def test_discover_forms_get_method(self):
+        """Test form with GET method"""
+        html = '''
+        <html>
+        <form action="/search" method="get">
+            <input type="text" name="q" />
+        </form>
+        </html>
+        '''
+        mock_response = Mock()
+        mock_response.text = html
+        self.tester.session.get = Mock(return_value=mock_response)
+
+        forms = self.tester.discover_forms("http://test.com")
+        self.assertEqual(forms[0]['method'], 'get')
+
+
+class TestSeverityAndOWASP(unittest.TestCase):
+    """Test Severity and OWASP constants"""
+
+    def test_severity_levels(self):
+        """Test Severity levels exist"""
+        self.assertIsNotNone(Severity.CRITICAL)
+        self.assertIsNotNone(Severity.HIGH)
+        self.assertIsNotNone(Severity.MEDIUM)
+        self.assertIsNotNone(Severity.LOW)
+        self.assertIsNotNone(Severity.INFO)
+        self.assertEqual(len(Severity.LEVELS), 5)
+
+    def test_owasp_categories(self):
+        """Test OWASP categories"""
+        self.assertEqual(OWASP.A01, "A01 - Broken Access Control")
+        self.assertEqual(OWASP.A03, "A03 - Injection")
+        self.assertEqual(OWASP.A10, "A10 - SSRF")
+
+    def test_cwe_mappings(self):
+        """Test CWE mappings"""
+        self.assertIn("xss", CWE_MAPPINGS)
+        self.assertIn("sqli", CWE_MAPPINGS)
+        self.assertEqual(CWE_MAPPINGS["xss"][0], "CWE-79")
+        self.assertEqual(CWE_MAPPINGS["sqli"][0], "CWE-89")
 
 
 if __name__ == '__main__':
