@@ -58,7 +58,7 @@ Open your terminal and run:
 
 ```bash
 # Clone the repository
-git clone https://github.com/MalangPHPUG/socrates-blade.git
+git clone https://github.com/scriptlog/socrates-blade.git
 
 # Enter the directory
 cd socrates-blade
@@ -380,7 +380,7 @@ Don't overwhelm target servers with too many requests. Use `--timeout` and `--th
 
 ## Getting Help
 
-- Check the [Issues](https://github.com/MalangPHPUG/socrates-blade/issues) page
+- Check the [Issues](https://github.com/scriptlog/socrates-blade/issues) page
 - Review the code in `socrates-blade.py` and `config.py`
 - Examine the payloads in the `payloads/` directory
 
